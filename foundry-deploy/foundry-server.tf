@@ -26,10 +26,11 @@ variable "instance_type" {
 resource "aws_instance" "this" {
   ami           = data.aws_ami.this.id
   instance_type = var.instance_type
-  security_groups = [
-    aws_security_group.this.name
+  vpc_security_group_ids = [
+    aws_security_group.this.id
   ]
   key_name  = data.aws_key_pair.this.key_name
+  subnet_id = data.aws_subnet.selected.id
   user_data = <<-EOF
               #!/bin/bash
               yum update -y
@@ -52,6 +53,7 @@ resource "aws_instance" "this" {
 resource "aws_security_group" "this" {
   name        = "foundry-server-sg"
   description = "Allow inbound SSH, HTTP, and HTTPS traffic"
+  vpc_id     = data.aws_vpc.main.id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_ssh_ipv4" {
