@@ -1,6 +1,6 @@
 data "aws_ami" "this" {
   most_recent = true
-  name_regex  = "amzn2-ami-kernel-*"
+  name_regex  = "amzn2-ami-hvm-*"
   owners      = ["amazon"]
 
   filter {
@@ -35,14 +35,16 @@ resource "aws_instance" "this" {
   user_data = <<-EOF
               #!/bin/bash
               yum update -y
-              echo "{" >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
-              echo "\"region\": \"us-east-1\"," >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
-              echo "\"buckets\": [\"${var.foundry_bucket_name}\"]," >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
-              echo "\"credentials\": {" >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
-              echo "\"accessKeyId\": \"${aws_iam_access_key.foundry.id}\"," >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
-              echo "\"secretAccessKey\": \"${aws_iam_access_key.foundry.secret}\"," >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
-              echo "}" >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
-              echo "}" >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
+              cd /
+              mkdir /foundry /foundry/data /foundry/data/Config
+              echo "{" >> /foundry/data/Config/aws.json
+              echo "\"region\": \"us-east-1\"," >> /foundry/data/Config/aws.json
+              echo "\"buckets\": [\"${var.foundry_bucket_name}\"]," >> /foundry/data/Config/aws.json
+              echo "\"credentials\": {" >> /foundry/data/Config/aws.json
+              echo "\"accessKeyId\": \"${aws_iam_access_key.foundry.id}\"," >> /foundry/data/Config/aws.json
+              echo "\"secretAccessKey\": \"${aws_iam_access_key.foundry.secret}\"," >> /foundry/data/Config/aws.json
+              echo "}" >> /foundry/data/Config/aws.json
+              echo "}" >> /foundry/data/Config/aws.json
 
               EOF
 
