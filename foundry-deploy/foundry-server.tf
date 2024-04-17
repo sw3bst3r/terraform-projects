@@ -27,7 +27,7 @@ resource "aws_instance" "this" {
   ami           = data.aws_ami.this.id
   instance_type = var.instance_type
   security_groups = [
-    aws_security_group.this.id
+    aws_security_group.this.name
   ]
   key_name  = data.aws_key_pair.this.key_name
   user_data = <<-EOF
@@ -45,13 +45,13 @@ resource "aws_instance" "this" {
               EOF
 
   tags = {
-    Name = "FoundryServer"
+    Name = "FoundryServerV2"
   }
 }
 
 resource "aws_security_group" "this" {
   name        = "foundry-server-sg"
-  description = ""
+  description = "Allow inbound SSH, HTTP, and HTTPS traffic"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_ssh_ipv4" {
