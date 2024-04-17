@@ -29,7 +29,20 @@ resource "aws_instance" "this" {
   security_groups = [
     aws_security_group.this.id
   ]
-  key_name = data.aws_key_pair.this.key_name
+  key_name  = data.aws_key_pair.this.key_name
+  user_data = <<-EOF
+              #!/bin/bash
+              yum update -y
+              echo "{" >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
+              echo "\"region\": \"us-east-1\"," >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
+              echo "\"buckets\": [\"${var.foundry_bucket_name}\"]," >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
+              echo "\"credentials\": {" >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
+              echo "\"accessKeyId\": \"${aws_iam_access_key.foundry.id}\"," >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
+              echo "\"secretAccessKey\": \"${aws_iam_access_key.foundry.secret}\"," >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
+              echo "}" >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
+              echo "}" >> ~/.local/share/FoundryVTT/foundrydata/Config/aws.json
+
+              EOF
 
   tags = {
     Name = "FoundryServer"
