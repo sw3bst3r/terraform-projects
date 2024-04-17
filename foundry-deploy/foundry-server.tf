@@ -25,6 +25,7 @@ variable "instance_type" {
 
 resource "aws_instance" "this" {
   ami           = data.aws_ami.this.id
+  associate_public_ip_address = true
   instance_type = var.instance_type
   vpc_security_group_ids = [
     aws_security_group.this.id
