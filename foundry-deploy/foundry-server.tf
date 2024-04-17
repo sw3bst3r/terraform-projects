@@ -9,12 +9,27 @@ data "aws_ami" "this" {
   }
 }
 
+variable "instance_kp_name" {
+  description = "The name of the key pair to use for the Foundry server instance"
+  type        = string
+}
+
+data "aws_key_pair" "this" {
+  key_name = var.instance_kp_name
+}
+
+variable "instance_type" {
+  description = "The instance type to use for the Foundry server"
+  type        = string
+}
+
 resource "aws_instance" "this" {
   ami           = data.aws_ami.this.id
-  instance_type = "t2.micro"
+  instance_type = var.instance_type
   security_groups = [
     aws_security_group.this.id
   ]
+  key_name = data.aws_key_pair.this.key_name
 
   tags = {
     Name = "FoundryServer"
