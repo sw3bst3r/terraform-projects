@@ -35,15 +35,15 @@ resource "aws_instance" "this" {
   user_data = <<-EOF
               #!/bin/bash
               sudo apt-get update
-              sudo curl -o- https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
-              source ~/.bashrc
-              nvm install 18
-              nvm use 18
+              sudo apt install -y ca-certificates curl gnupg
+              sudo mkdir -p /etc/apt/keyrings
+              curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+              echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
               sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
               curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
               curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
               sudo apt update
-              sudo apt install caddy unzip
+              sudo apt install nodejs caddy unzip
               cd /
               mkdir /home/ubuntu/foundryvtt /home/ubuntu/foundrydata /home/ubuntu/foundrydata/Config
               echo "{" >> /home/ubuntu/foundrydata/Config/aws.json
@@ -56,10 +56,11 @@ resource "aws_instance" "this" {
               echo "}" >> /home/ubuntu/foundrydata/Config/aws.json
               
               cd /home/ubuntu/foundryvtt
-              wget -O foundryvtt.zip "https://drive.google.com/file/d/11c2V9m2dLcdI6OnurZ5eMdsE7eafSY4C/view?usp=sharing"
-              unzip foundryvtt.zip
-              rm -rf foundryvtt.zip
+              sudo curl -o foundryvtt.zip -L "https://github.com/sw3bst3r/terraform-projects/blob/main/foundry-deploy/foundry_zip/FoundryVTT-11.315.zip?raw=true"
+              sudo unzip foundryvtt.zip
+              sudo rm foundryvtt.zip
               npm install pm2 -g
+              pm2 startup
               sudo env PATH=$PATH:/home/ubuntu/.nvm/versions/node/v18.20.2/bin /home/ubuntu/.nvm/versions/node/v18.20.2/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
               pm2 start "node /home/ubuntu/foundryvtt/resources/app/main.js --dataPath=/home/ubuntu/foundrydata" --name foundry
               pm2 save
