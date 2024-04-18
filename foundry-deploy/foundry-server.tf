@@ -35,7 +35,6 @@ resource "aws_instance" "this" {
   user_data = <<-EOF
               #!/bin/bash
               sudo apt-get update
-              sudo apt upgrade -y
               sudo curl -o- https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
               source ~/.bashrc
               nvm install 18
@@ -57,7 +56,7 @@ resource "aws_instance" "this" {
               echo "}" >> /home/ubuntu/foundrydata/Config/aws.json
               
               cd /home/ubuntu/foundryvtt
-              wget -O foundryvtt.zip "https://drive.google.com/file/d/11c2V9m2dLcdI6OnurZ5eMdsE7eafSY4C/view?usp=drive_link"
+              wget -O foundryvtt.zip "https://drive.google.com/file/d/11c2V9m2dLcdI6OnurZ5eMdsE7eafSY4C/view?usp=sharing"
               unzip foundryvtt.zip
               rm -rf foundryvtt.zip
               npm install pm2 -g
