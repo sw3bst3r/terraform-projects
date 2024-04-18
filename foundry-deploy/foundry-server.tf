@@ -62,9 +62,15 @@ resource "aws_instance" "this" {
               sudo unzip foundryvtt.zip
               sudo rm foundryvtt.zip
               sudo apt-get upgrade -y
+              cd /home/ubuntu
+              sudo 
               sudo npm install pm2 -g
-              pm2 startup ubuntu
+              pm2 startup
               sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
+              sudo chmod -R +x /home/ubuntu/foundryvtt
+              sudo chmod -R +x /home/ubuntu/foundrydata
+              sudo chown ubuntu /home/ubuntu/foundryvtt
+              sudo chown ubuntu -R /home/ubuntu/foundrydata
               sudo -u ubuntu pm2 start "node /home/ubuntu/foundryvtt/resources/app/main.js --dataPath=/home/ubuntu/foundrydata" --name foundry
               sudo -u ubuntu pm2 save
               EOF
