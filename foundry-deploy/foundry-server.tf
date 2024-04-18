@@ -1,6 +1,6 @@
 data "aws_ami" "this" {
   most_recent = true
-  name_regex  = "amzn2-ami-hvm-*"
+  name_regex  = "ubuntu/images/hvm-ssd/ubuntu-jammy-*"
   owners      = ["amazon"]
 
   filter {
@@ -34,7 +34,7 @@ resource "aws_instance" "this" {
   subnet_id = data.aws_subnet.selected.id
   user_data = <<-EOF
               #!/bin/bash
-              yum update -y
+              sudo apt-get update
               cd /
               mkdir /foundry /foundry/data /foundry/data/Config
               echo "{" >> /foundry/data/Config/aws.json
@@ -69,7 +69,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_ssh_ipv4" {
 
 resource "aws_vpc_security_group_ingress_rule" "allow_http_ipv4" {
   security_group_id = aws_security_group.this.id
-  cidr_ipv4         = data.aws_vpc.main.cidr_block
+  cidr_ipv4         = "0.0.0.0/0"
   from_port         = 80
   ip_protocol       = "tcp"
   to_port           = 80
@@ -77,10 +77,18 @@ resource "aws_vpc_security_group_ingress_rule" "allow_http_ipv4" {
 
 resource "aws_vpc_security_group_ingress_rule" "allow_https_ipv4" {
   security_group_id = aws_security_group.this.id
-  cidr_ipv4         = data.aws_vpc.main.cidr_block
+  cidr_ipv4         = "0.0.0.0/0"
   from_port         = 443
   ip_protocol       = "tcp"
   to_port           = 443
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_foundry_ipv4" {
+  security_group_id = aws_security_group.this.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 30000
+  ip_protocol       = "tcp"
+  to_port           = 30000
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
