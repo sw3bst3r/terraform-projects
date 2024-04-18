@@ -34,7 +34,9 @@ resource "aws_instance" "this" {
   subnet_id = data.aws_subnet.selected.id
   user_data = <<-EOF
               #!/bin/bash
+              sudo NEEDRESTART_MODE=a apt-get dist-upgrade --yes
               sudo apt-get update
+              sudo apt-get upgrade -y
               sudo apt install -y ca-certificates curl gnupg
               sudo mkdir -p /etc/apt/keyrings
               curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
@@ -59,11 +61,12 @@ resource "aws_instance" "this" {
               sudo curl -o foundryvtt.zip -L "https://github.com/sw3bst3r/terraform-projects/blob/main/foundry-deploy/foundry_zip/FoundryVTT-11.315.zip?raw=true"
               sudo unzip foundryvtt.zip
               sudo rm foundryvtt.zip
-              npm install pm2 -g
-              pm2 startup
-              sudo env PATH=$PATH:/home/ubuntu/.nvm/versions/node/v18.20.2/bin /home/ubuntu/.nvm/versions/node/v18.20.2/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
-              pm2 start "node /home/ubuntu/foundryvtt/resources/app/main.js --dataPath=/home/ubuntu/foundrydata" --name foundry
-              pm2 save
+              sudo apt-get upgrade -y
+              sudo npm install pm2 -g
+              pm2 startup ubuntu
+              sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
+              sudo -u ubuntu pm2 start "node /home/ubuntu/foundryvtt/resources/app/main.js --dataPath=/home/ubuntu/foundrydata" --name foundry
+              sudo -u ubuntu pm2 save
               EOF
 
   tags = {
