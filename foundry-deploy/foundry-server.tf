@@ -35,17 +35,35 @@ resource "aws_instance" "this" {
   user_data = <<-EOF
               #!/bin/bash
               sudo apt-get update
+              sudo apt upgrade -y
+              sudo curl -o- https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+              source ~/.bashrc
+              nvm install 18
+              nvm use 18
+              sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
+              curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+              curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+              sudo apt update
+              sudo apt install caddy unzip
               cd /
-              mkdir /foundry /foundry/data /foundry/data/Config
-              echo "{" >> /foundry/data/Config/aws.json
-              echo "\"region\": \"us-east-1\"," >> /foundry/data/Config/aws.json
-              echo "\"buckets\": [\"${var.foundry_bucket_name}\"]," >> /foundry/data/Config/aws.json
-              echo "\"credentials\": {" >> /foundry/data/Config/aws.json
-              echo "\"accessKeyId\": \"${aws_iam_access_key.foundry.id}\"," >> /foundry/data/Config/aws.json
-              echo "\"secretAccessKey\": \"${aws_iam_access_key.foundry.secret}\"," >> /foundry/data/Config/aws.json
-              echo "}" >> /foundry/data/Config/aws.json
-              echo "}" >> /foundry/data/Config/aws.json
-
+              mkdir /home/ubuntu/foundryvtt /home/ubuntu/foundrydata /home/ubuntu/foundrydata/Config
+              echo "{" >> /home/ubuntu/foundrydata/Config/aws.json
+              echo "\"region\": \"us-east-1\"," >> /home/ubuntu/foundrydata/Config/aws.json
+              echo "\"buckets\": [\"${var.foundry_bucket_name}\"]," >> /home/ubuntu/foundrydata/Config/aws.json
+              echo "\"credentials\": {" >> /home/ubuntu/foundrydata/Config/aws.json
+              echo "\"accessKeyId\": \"${aws_iam_access_key.foundry.id}\"," >> /home/ubuntu/foundrydata/Config/aws.json
+              echo "\"secretAccessKey\": \"${aws_iam_access_key.foundry.secret}\"," >> /home/ubuntu/foundrydata/Config/aws.json
+              echo "}" >> /home/ubuntu/foundrydata/Config/aws.json
+              echo "}" >> /home/ubuntu/foundrydata/Config/aws.json
+              
+              cd /home/ubuntu/foundryvtt
+              wget -O foundryvtt.zip "https://drive.google.com/file/d/11c2V9m2dLcdI6OnurZ5eMdsE7eafSY4C/view?usp=drive_link"
+              unzip foundryvtt.zip
+              rm -rf foundryvtt.zip
+              npm install pm2 -g
+              sudo env PATH=$PATH:/home/ubuntu/.nvm/versions/node/v18.20.2/bin /home/ubuntu/.nvm/versions/node/v18.20.2/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
+              pm2 start "node /home/ubuntu/foundryvtt/resources/app/main.js --dataPath=/home/ubuntu/foundrydata" --name foundry
+              pm2 save
               EOF
 
   tags = {
