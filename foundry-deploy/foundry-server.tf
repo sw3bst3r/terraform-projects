@@ -47,6 +47,12 @@ resource "aws_instance" "this" {
               sudo apt update
               sudo apt install nodejs caddy unzip
               cd /
+              sudo rm /etc/caddy/Caddyfile
+              echo "${var.top_level_domain}.${var.domain_name} {" >> /etc/caddy/Caddyfile
+              echo "reverse_proxy localhost:30000" >> /etc/caddy/Caddyfile
+              echo "encode zstd gzip" >> /etc/caddy/Caddyfile
+              echo "}" >> /etc/caddy/Caddyfile
+              sudo service caddy restart
               mkdir /home/ubuntu/foundryvtt /home/ubuntu/foundrydata /home/ubuntu/foundrydata/Config
               echo "{" >> /home/ubuntu/foundrydata/Config/aws.json
               echo "\"region\": \"us-east-1\"," >> /home/ubuntu/foundrydata/Config/aws.json
@@ -69,12 +75,17 @@ resource "aws_instance" "this" {
               sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
               sudo chmod -R +x /home/ubuntu/foundryvtt
               sudo chmod -R +x /home/ubuntu/foundrydata
-              sudo chown ubuntu /home/ubuntu/foundryvtt
+              sudo chown ubuntu -R /home/ubuntu/foundryvtt
               sudo chown ubuntu -R /home/ubuntu/foundrydata
               sudo -u ubuntu pm2 start "node /home/ubuntu/foundryvtt/resources/app/main.js --dataPath=/home/ubuntu/foundrydata" --name foundry
               sudo -u ubuntu pm2 save
-              EOF
 
+              cd /home/ubuntu/foundrydata/Config
+              sudo rm options.json
+              sudo curl -o options.json ""
+              EOF
+ = "options.json"
+  }
   tags = {
     Name = "FoundryServerV2"
   }
