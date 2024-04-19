@@ -82,7 +82,9 @@ resource "aws_instance" "this" {
 
               cd /home/ubuntu/foundrydata/Config
               sudo rm options.json
-              sudo curl -o options.json ""
+              sudo curl -o options.json "https://github.com/sw3bst3r/terraform-projects/blob/046bdb65f401bb8b660e337d360d8b8ce7a90108/foundry-deploy/options.json"
+              pm2 restart foundry
+              
               EOF
   
   tags = {
