@@ -84,8 +84,7 @@ resource "aws_instance" "this" {
               sudo rm options.json
               sudo curl -o options.json ""
               EOF
- = "options.json"
-  }
+  
   tags = {
     Name = "FoundryServerV2"
   }
