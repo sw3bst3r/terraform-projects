@@ -24,9 +24,9 @@ variable "instance_type" {
 }
 
 resource "aws_instance" "this" {
-  ami           = data.aws_ami.this.id
+  ami                         = data.aws_ami.this.id
   associate_public_ip_address = true
-  instance_type = var.instance_type
+  instance_type               = var.instance_type
   vpc_security_group_ids = [
     aws_security_group.this.id
   ]
@@ -59,7 +59,7 @@ resource "aws_instance" "this" {
               echo "\"buckets\": [\"${var.foundry_bucket_name}\"]," >> /home/ubuntu/foundrydata/Config/aws.json
               echo "\"credentials\": {" >> /home/ubuntu/foundrydata/Config/aws.json
               echo "\"accessKeyId\": \"${aws_iam_access_key.foundry.id}\"," >> /home/ubuntu/foundrydata/Config/aws.json
-              echo "\"secretAccessKey\": \"${aws_iam_access_key.foundry.secret}\"," >> /home/ubuntu/foundrydata/Config/aws.json
+              echo "\"secretAccessKey\": \"${aws_iam_access_key.foundry.secret}\"" >> /home/ubuntu/foundrydata/Config/aws.json
               echo "}" >> /home/ubuntu/foundrydata/Config/aws.json
               echo "}" >> /home/ubuntu/foundrydata/Config/aws.json
               
@@ -87,7 +87,7 @@ resource "aws_instance" "this" {
               sudo -u ubuntu pm2 restart foundry
 
               EOF
-  
+
   tags = {
     Name = "FoundryServerV2"
   }
@@ -96,7 +96,7 @@ resource "aws_instance" "this" {
 resource "aws_security_group" "this" {
   name        = "foundry-server-sg"
   description = "Allow inbound SSH, HTTP, and HTTPS traffic"
-  vpc_id     = data.aws_vpc.main.id
+  vpc_id      = data.aws_vpc.main.id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_ssh_ipv4" {
